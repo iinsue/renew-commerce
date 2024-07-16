@@ -67,3 +67,10 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* 높이를 100% 로 설정 */
+html,
+body,
+:root {
+  height: 100%;
+}
