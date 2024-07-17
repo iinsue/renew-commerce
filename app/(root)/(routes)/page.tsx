@@ -1,11 +1,10 @@
 "use client";
 
 import { useEffect } from "react";
-import { UserButton } from "@clerk/nextjs";
 
 import { useStoreModal } from "@/hooks/use-store-modal";
 
-export default function Home() {
+export default function SetupPage() {
   const { onOpen, isOpen } = useStoreModal();
 
   useEffect(() => {
@@ -14,11 +13,5 @@ export default function Home() {
     }
   }, [isOpen, onOpen]);
 
-  return (
-    <main className="h-full bg-slate-200 p-2">
-      <UserButton afterSwitchSessionUrl="/" />
-
-      <div>메인 페이지</div>
-    </main>
-  );
+  return null;
 }

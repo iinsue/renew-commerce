@@ -1,6 +1,8 @@
 "use client";
 
 import * as z from "zod";
+import { useTransition } from "react";
+import axios from "axios";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -23,6 +25,7 @@ const formSchema = z.object({
 
 export const StoreModal = () => {
   const { isOpen, onClose } = useStoreModal();
+  const [isPending, startTransition] = useTransition();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -32,8 +35,14 @@ export const StoreModal = () => {
   });
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log(values);
-    // TODO: 상점 생성하기
+    try {
+      startTransition(async () => {
+        const response = await axios.post("/api/stores", values);
+        window.location.assign(`/${response.data.id}`);
+      });
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -53,17 +62,28 @@ export const StoreModal = () => {
                 <FormItem>
                   <FormLabel>가게 이름</FormLabel>
                   <FormControl>
-                    <Input placeholder="가게 이름을 입력하세요." {...field} />
+                    <Input
+                      placeholder="가게 이름을 입력하세요."
+                      disabled={isPending}
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
             <div className="flex w-full items-center justify-end space-x-2 pt-6">
-              <Button variant="outline" type="button" onClick={onClose}>
+              <Button
+                disabled={isPending}
+                variant="outline"
+                type="button"
+                onClick={onClose}
+              >
                 취소하기
               </Button>
-              <Button type="submit">계속하기</Button>
+              <Button type="submit" disabled={isPending}>
+                계속하기
+              </Button>
             </div>
           </form>
         </Form>
