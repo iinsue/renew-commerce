@@ -9,7 +9,6 @@ export default function Home() {
   const { onOpen, isOpen } = useStoreModal();
 
   useEffect(() => {
-    console.log("open", isOpen);
     if (isOpen === false) {
       onOpen();
     }
