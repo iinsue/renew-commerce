@@ -1,3 +1,4 @@
+import { Navbar } from "@/components/navigation/navbar";
 import db from "@/lib/prismadb";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
@@ -30,7 +31,7 @@ const DashboardLayout = async ({ children, params }: Props) => {
 
   return (
     <>
-      <div>TODO: Navbar 추가할 위치</div>
+      <Navbar />
       {children}
     </>
   );
