@@ -22,6 +22,7 @@ import { Heading } from "@/components/ui/heading";
 import { useParams, useRouter } from "next/navigation";
 import axios from "axios";
 import { toast } from "sonner";
+import { AlertModal } from "@/components/modals/alert-modal";
 
 type Props = {
   initialData: Store;
@@ -36,31 +37,58 @@ export const SettingsForm: React.FC<Props> = ({ initialData }) => {
   const params = useParams();
 
   const [isOpen, setIsOpen] = useState(false);
-  const [isPending, setStartTransition] = useTransition();
+  const [isPatchPending, setPatchTransition] = useTransition();
+  const [isDeletePending, setDeleteTransition] = useTransition();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: initialData,
   });
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    setStartTransition(async () => {
+  // 수정 기능
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
+    setPatchTransition(async () => {
       try {
         await axios.patch(`/api/stores/${params.storeId}`, values);
         router.refresh();
-        toast.success("가게 이름이 변경되었습니다.", { id: "update-success" });
+        toast.success("가게 이름이 변경되었습니다.", { id: "patch-store" });
       } catch (error) {
-        toast.error("이름 변경에 실패했습니다.");
+        toast.error("이름 변경에 실패했습니다.", { id: "patch-store" });
+      }
+    });
+  };
+
+  // 삭제 기능
+  const onDelete = () => {
+    setDeleteTransition(async () => {
+      try {
+        await axios.delete(`/api/stores/${params.storeId}`);
+        router.refresh();
+        toast.success("삭제되었습니다.", { id: "delete-store" });
+        router.push("/");
+      } catch (error) {
+        toast.error("모든 물품과 카테고리를 삭제했는지 확인하세요.", {
+          id: "delete-store",
+        });
+      } finally {
+        setIsOpen(false);
       }
     });
   };
 
   return (
     <>
+      {/* 삭제 확인 모달 */}
+      <AlertModal
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+        onConfirm={onDelete}
+        loading={isDeletePending}
+      />
       <div className="flex items-center justify-between">
         <Heading title="Settings" description="Manage store preferences" />
         <Button
-          disabled={isPending}
+          disabled={isPatchPending}
           variant="destructive"
           size="icon"
           onClick={() => setIsOpen(true)}
@@ -83,7 +111,7 @@ export const SettingsForm: React.FC<Props> = ({ initialData }) => {
                   <FormLabel>Name</FormLabel>
                   <FormControl>
                     <Input
-                      disabled={isPending}
+                      disabled={isPatchPending}
                       placeholder="Store name"
                       {...field}
                     />
@@ -93,9 +121,9 @@ export const SettingsForm: React.FC<Props> = ({ initialData }) => {
               )}
             />
           </div>
-          <Button disabled={isPending} className="ml-auto" type="submit">
-            {isPending && <Loader2 className="mr-2 size-4 animate-spin" />}
-            Save changes
+          <Button disabled={isPatchPending} className="ml-auto" type="submit">
+            {isPatchPending && <Loader2 className="mr-2 size-4 animate-spin" />}
+            변경하기
           </Button>
         </form>
       </Form>
