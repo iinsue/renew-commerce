@@ -13,7 +13,7 @@ export async function POST(request: Request) {
       return new NextResponse("로그인이 필요합니다.", { status: 401 });
     }
 
-    // 매장 이름이 있는지 확인
+    // 가게 이름이 있는지 확인
     if (!name) {
       return new NextResponse("등록하려는 매장 이름이 필요합니다.", {
         status: 400,
