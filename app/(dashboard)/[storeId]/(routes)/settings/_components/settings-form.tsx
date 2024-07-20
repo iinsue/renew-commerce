@@ -1,10 +1,14 @@
 "use client";
 
 import * as z from "zod";
-import { useState, useTransition } from "react";
+import axios from "axios";
+import { toast } from "sonner";
 import { Store } from "@prisma/client";
 import { useForm } from "react-hook-form";
+import { useState, useTransition } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useParams, useRouter } from "next/navigation";
+
 import { Loader2, Trash } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
@@ -19,10 +23,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Heading } from "@/components/ui/heading";
-import { useParams, useRouter } from "next/navigation";
-import axios from "axios";
-import { toast } from "sonner";
 import { AlertModal } from "@/components/modals/alert-modal";
+import { ApiAlert } from "@/components/ui/api-alert";
+import { useOrigin } from "@/hooks/use-origin";
 
 type Props = {
   initialData: Store;
@@ -35,6 +38,7 @@ const formSchema = z.object({
 export const SettingsForm: React.FC<Props> = ({ initialData }) => {
   const router = useRouter();
   const params = useParams();
+  const origin = useOrigin();
 
   const [isOpen, setIsOpen] = useState(false);
   const [isPatchPending, setPatchTransition] = useTransition();
@@ -127,6 +131,12 @@ export const SettingsForm: React.FC<Props> = ({ initialData }) => {
           </Button>
         </form>
       </Form>
+      <Separator />
+      <ApiAlert
+        title="NEXT_PUBLIC_API_URL"
+        description={`${origin}/api/${params.storeId}`}
+        variants="public"
+      />
     </>
   );
 };
