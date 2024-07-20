@@ -11,6 +11,7 @@ export const useOrigin = () => {
     setMounted(true);
   }, []);
 
+  // Hydration Trick
   if (mounted === false) {
     return "";
   }
