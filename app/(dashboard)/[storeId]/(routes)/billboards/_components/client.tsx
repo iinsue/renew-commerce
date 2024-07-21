@@ -7,8 +7,14 @@ import { Heading } from "@/components/ui/heading";
 import { Separator } from "@/components/ui/separator";
 
 import { Plus } from "lucide-react";
+import { BillboardColumns, columns } from "./columns";
+import { DataTable } from "@/components/ui/data-table";
 
-export const BillboardClient = () => {
+type Props = {
+  data: BillboardColumns[];
+};
+
+export const BillboardClient = ({ data }: Props) => {
   const router = useRouter();
   const params = useParams();
 
@@ -16,7 +22,7 @@ export const BillboardClient = () => {
     <>
       <div className="flex items-center justify-between">
         <Heading
-          title="빌보드 (0)"
+          title={`빌보드 (${data.length})`}
           description="가게의 빌보드를 관리할 수 있습니다."
         />
         <Button
@@ -27,6 +33,7 @@ export const BillboardClient = () => {
         </Button>
       </div>
       <Separator />
+      <DataTable searchKey="label" columns={columns} data={data} />
     </>
   );
 };
