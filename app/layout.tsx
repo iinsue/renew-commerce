@@ -23,7 +23,7 @@ export default function RootLayout({
       <html lang="ko">
         <body className={inter.className}>
           <ModalProvider />
-          <Toaster duration={1000} position="top-center" />
+          <Toaster duration={1500} position="top-center" />
           {children}
         </body>
       </html>

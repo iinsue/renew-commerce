@@ -27,10 +27,10 @@ export const ApiAlert: React.FC<Props> = ({
   description,
   variants = "public",
 }) => {
-  // 클립보드에 클릭한 URL 복사
+  // 클립보드에 클릭한 API Route 복사
   const onCopy = () => {
     navigator.clipboard.writeText(description);
-    toast.success("API Route copied to the clipboard.", {
+    toast.success("클립보드에 복사되었습니다.", {
       id: "copy-to-clipboard",
     });
   };
