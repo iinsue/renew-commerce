@@ -15,7 +15,6 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { AlertModal } from "@/components/modals/alert-modal";
-import { ApiAlert } from "@/components/ui/api-alert";
 import {
   Form,
   FormControl,
@@ -24,7 +23,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { useOrigin } from "@/hooks/use-origin";
+import { ImageUploadComponent } from "@/components/ui/image-upload";
 
 const formSchema = z.object({
   label: z.string().min(1),
@@ -38,10 +37,10 @@ type Props = {
 export const BillboardForm: React.FC<Props> = ({ initialData }) => {
   const params = useParams();
   const router = useRouter();
-  const origin = useOrigin();
 
   const [isOpen, setIsOpen] = useState(false);
-  const [isPending, startTransition] = useTransition();
+  const [isPatchPending, startPatchTransition] = useTransition();
+  const [isDeletePending, startDeleteTransition] = useTransition();
 
   const title = initialData ? "빌보드 수정" : "빌보드 생성";
   const description = initialData ? "빌보드 수정" : "새 빌보드 추가";
@@ -57,11 +56,13 @@ export const BillboardForm: React.FC<Props> = ({ initialData }) => {
     defaultValues: initialData || { label: "", imageUrl: "" },
   });
 
-  const onSubmit = () => {
+  // 빌보드 수정
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
     // TODO: 빌보드 수정 연동
   };
 
-  const onDelete = () => {
+  // 빌보드 삭제
+  const onDelete = async () => {
     // TODO: 빌보드 삭제 연동
   };
 
@@ -71,7 +72,7 @@ export const BillboardForm: React.FC<Props> = ({ initialData }) => {
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
         onConfirm={onDelete}
-        loading={isPending}
+        loading={isDeletePending}
       />
       <div className="flex items-center justify-between">
         <Heading title={title} description={description} />
@@ -79,7 +80,7 @@ export const BillboardForm: React.FC<Props> = ({ initialData }) => {
           <Button
             size="icon"
             variant="destructive"
-            disabled={isPending}
+            disabled={isPatchPending}
             onClick={() => setIsOpen(true)}
           >
             <Trash className="size-4" />
@@ -92,6 +93,23 @@ export const BillboardForm: React.FC<Props> = ({ initialData }) => {
           onSubmit={form.handleSubmit(onSubmit)}
           className="w-full space-y-8"
         >
+          <FormField
+            name="imageUrl"
+            control={form.control}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>배경 이미지</FormLabel>
+                <FormControl>
+                  <ImageUploadComponent
+                    disabled={isPatchPending}
+                    onChange={(url) => field.onChange(url)}
+                    onRemove={() => field.onChange("")}
+                    value={field.value ? [field.value] : []}
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
           <div className="grid grid-cols-3 gap-8">
             <FormField
               name="label"
@@ -101,7 +119,7 @@ export const BillboardForm: React.FC<Props> = ({ initialData }) => {
                   <FormLabel>빌보드 이름</FormLabel>
                   <FormControl>
                     <Input
-                      disabled={isPending}
+                      disabled={isPatchPending}
                       placeholder="빌보드 이름을 입력하세요."
                       {...field}
                     />
@@ -111,17 +129,12 @@ export const BillboardForm: React.FC<Props> = ({ initialData }) => {
               )}
             />
           </div>
-          <Button type="submit" className="ml-auto" disabled={isPending}>
+          <Button type="submit" className="ml-auto" disabled={isPatchPending}>
             {action}
           </Button>
         </form>
       </Form>
       <Separator />
-      <ApiAlert
-        title="NEXT_PUBLIC_API_URL"
-        description={`${origin}/api/${params.storeId}`}
-        variants="public"
-      />
     </>
   );
 };
