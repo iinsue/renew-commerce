@@ -64,11 +64,11 @@ export const CategoryForm: React.FC<Props> = ({ initialData, billboards }) => {
     startTransition(async () => {
       try {
         await axios.post(`/api/${params.storeId}/categories`, values);
-        router.refresh();
         toast.success("카테고리가 등록되었습니다.", {
           id: "category",
         });
         router.push(`/${params.storeId}/categories`);
+        router.refresh();
       } catch (error) {
         toast.error("등록에 실패했습니다.", {
           id: "category",
@@ -77,7 +77,24 @@ export const CategoryForm: React.FC<Props> = ({ initialData, billboards }) => {
     });
   };
 
-  const onDelete = () => {};
+  const onDelete = () => {
+    startDeleteTransition(async () => {
+      try {
+        await axios.delete(
+          `/api/${params.storeId}/categories/${params.categoryId}`,
+        );
+        toast.success("카테고리가 삭제되었습니다.", {
+          id: "delete-category",
+        });
+        router.push(`/${params.storeId}/categories`);
+        router.refresh();
+      } catch (error) {
+        toast.error("카테고리 삭제에 실패했습니다.", {
+          id: "delete-category",
+        });
+      }
+    });
+  };
 
   return (
     <>
