@@ -1,16 +1,39 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Billboard, Category } from "@prisma/client";
-import { useParams, useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
-import { useForm } from "react-hook-form";
-import { toast } from "sonner";
 import * as z from "zod";
+import axios from "axios";
+import { toast } from "sonner";
+import { useState, useTransition } from "react";
+import { Billboard, Category } from "@prisma/client";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useParams, useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { Trash } from "lucide-react";
+
+import { Separator } from "@/components/ui/separator";
+import { AlertModal } from "@/components/modals/alert-modal";
+import { Button } from "@/components/ui/button";
+import { Heading } from "@/components/ui/heading";
+import { Input } from "@/components/ui/input";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const formSchema = z.object({
-  name: z.string().min(1),
-  billboardId: z.string().min(1),
+  name: z.string().min(1, { message: "카테고리 이름을 입력해주세요." }),
+  billboardId: z.string().min(1, { message: "빌보드를 선택해주세요." }),
 });
 
 type Props = {
@@ -40,15 +63,105 @@ export const CategoryForm: React.FC<Props> = ({ initialData, billboards }) => {
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     startTransition(async () => {
       try {
+        await axios.post(`/api/${params.storeId}/categories`, values);
+        router.refresh();
+        toast.success("카테고리가 등록되었습니다.", {
+          id: "category",
+        });
+        router.push(`/${params.storeId}/categories`);
       } catch (error) {
-        toast.error("", { id: "category" });
+        toast.error("등록에 실패했습니다.", {
+          id: "category",
+        });
       }
     });
   };
 
+  const onDelete = () => {};
+
   return (
     <>
-      <div>Category Form</div>
+      <AlertModal
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+        onConfirm={onDelete}
+        loading={isDeletePending}
+      />
+      <div className="flex items-center justify-between">
+        <Heading title={title} description={description} />
+        {initialData && (
+          <Button
+            variant="destructive"
+            onClick={() => setIsOpen(true)}
+            size="icon"
+            disabled={isPending}
+          >
+            <Trash className="size-4" />
+          </Button>
+        )}
+      </div>
+      <Separator />
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="w-full space-y-8"
+        >
+          <div className="grid grid-cols-3 gap-8">
+            <FormField
+              name="name"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>카테고리 이름</FormLabel>
+                  <FormControl>
+                    <Input
+                      disabled={isPending}
+                      placeholder="카테고리 이름을 입력하세요."
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              name="billboardId"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>빌보드</FormLabel>
+                  <Select
+                    disabled={isPending}
+                    onValueChange={field.onChange}
+                    value={field.value}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue
+                          defaultValue={field.value}
+                          placeholder="빌보드를 선택하세요."
+                        />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {billboards.map((billboard) => (
+                        <SelectItem key={billboard.id} value={billboard.id}>
+                          {billboard.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+          <Button type="submit" disabled={isPending} className="ml-auto">
+            {actions}
+          </Button>
+        </form>
+      </Form>
     </>
   );
 };
