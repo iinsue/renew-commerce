@@ -1,4 +1,4 @@
-import { SizeForm } from "../_components/size-form";
+import { SizeForm } from "./_components/size-form";
 
 const SizePage = () => {
   return (
