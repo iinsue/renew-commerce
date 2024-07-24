@@ -60,3 +60,47 @@ export async function PATCH(
     return new NextResponse("서버 오류", { status: 500 });
   }
 }
+
+export async function DELETE(
+  request: Request,
+  { params }: { params: { storeId: string; sizeId: string } },
+) {
+  try {
+    const { userId } = auth();
+
+    // 인증된 사용자인지 확인
+    if (!userId) {
+      return new NextResponse("로그인이 필요합니다.", { status: 401 });
+    }
+
+    // 사이즈 아이디가 있는지 확인
+    if (!params.sizeId) {
+      return new NextResponse("사이즈를 찾을 수 없습니다.", { status: 400 });
+    }
+
+    // 유저가 권한이 있는지 확인
+    const storeByUserId = await db.store.findFirst({
+      where: {
+        id: params.storeId,
+        userId,
+      },
+    });
+
+    // 권한이 없다면 에러 반환
+    if (!storeByUserId) {
+      return new NextResponse("Unauthorized", { status: 405 });
+    }
+
+    // 사이즈 삭제
+    const size = await db.size.delete({
+      where: {
+        id: params.sizeId,
+      },
+    });
+
+    return NextResponse.json(size);
+  } catch (error) {
+    console.log("[SIZE_DELETE]", error);
+    return new NextResponse("서버 오류", { status: 500 });
+  }
+}
