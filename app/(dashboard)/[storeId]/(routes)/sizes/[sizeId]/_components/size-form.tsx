@@ -60,14 +60,24 @@ export const SizeForm: React.FC<Props> = ({ initialData }) => {
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     startTransition(async () => {
       try {
-        await axios.post(`/api/${params.storeId}/sizes`, values);
-        toast.success("사이즈가 생성되었습니다.", {
-          id: "category",
-        });
+        if (initialData) {
+          await axios.patch(
+            `/api/${params.storeId}/sizes/${params.sizeId}`,
+            values,
+          );
+          toast.success("사이즈가 수정되었습니다.", {
+            id: "size",
+          });
+        } else {
+          await axios.post(`/api/${params.storeId}/sizes`, values);
+          toast.success("사이즈가 생성되었습니다.", {
+            id: "size",
+          });
+        }
         router.push(`/${params.storeId}/sizes`);
         router.refresh();
       } catch (error) {
-        toast.error("생성에 실패했습니다.");
+        toast.error("실패했습니다.", { id: "size" });
       }
     });
   };
