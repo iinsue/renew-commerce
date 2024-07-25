@@ -8,6 +8,7 @@ export type ProductColumn = {
   price: string;
   category: string;
   color: string;
+  size: string;
   isFeatured: boolean;
   isArchived: boolean;
   createdAt: string;

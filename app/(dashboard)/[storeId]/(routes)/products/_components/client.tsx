@@ -33,7 +33,7 @@ export const ProductClient: React.FC<Props> = ({ data }) => {
         </Button>
       </div>
       <Separator />
-      <DataTable searchKey="label" columns={columns} data={data} />
+      <DataTable searchKey="name" columns={columns} data={data} />
       <Heading title="API" description="상품을 위한 API를 제공합니다." />
       <Separator />
       <ApiList entityName="products" entityIdName="productId" />
