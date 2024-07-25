@@ -69,9 +69,9 @@ export const BillboardForm: React.FC<Props> = ({ initialData }) => {
         } else {
           await axios.post(`/api/${params.storeId}/billboards`, values);
         }
-        router.refresh();
         toast.success(toastMessage, { id: "patch-billboard" });
         router.push(`/${params.storeId}/billboards`);
+        router.refresh();
       } catch (error) {
         toast.error("변경에 실패했습니다.", { id: "patch-billboard" });
       }
