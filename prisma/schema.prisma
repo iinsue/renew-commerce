@@ -91,7 +91,7 @@ model Color {
 model Product {
   id         String  @id @default(uuid())
   name       String
-  price      Decimal
+  price      String
   isFeatured Boolean @default(false)
   isArchived Boolean @default(false)
   images     Image[]
