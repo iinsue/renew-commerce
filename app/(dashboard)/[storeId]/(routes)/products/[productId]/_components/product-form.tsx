@@ -84,12 +84,22 @@ export const ProductForm: React.FC<Props> = ({
         },
   });
 
-  // 상품 등록
+  // 상품 등록 & 수정
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     startTransition(async () => {
       try {
-        await axios.post(`/api/${params.storeId}/products`, values);
-        toast.success("상품을 등록했습니다.", { id: "product" });
+        if (initialData) {
+          // 상품 수정
+          await axios.patch(
+            `/api/${params.storeId}/products/${params.productId}`,
+            values,
+          );
+          toast.success("상품을 수정했습니다.", { id: "product" });
+        } else {
+          // 상품 등록
+          await axios.post(`/api/${params.storeId}/products`, values);
+          toast.success("상품을 등록했습니다.", { id: "product" });
+        }
         router.push(`/${params.storeId}/products`);
         router.refresh();
       } catch (error) {
