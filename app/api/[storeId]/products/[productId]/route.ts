@@ -102,3 +102,42 @@ export async function PATCH(
     return new NextResponse("서버 오류", { status: 500 });
   }
 }
+
+export async function DELETE(
+  request: Request,
+  { params }: { params: { storeId: string; productId: string } },
+) {
+  try {
+    const { userId } = auth();
+
+    if (!userId) {
+      return new NextResponse("Unauthenticated", { status: 403 });
+    }
+
+    if (!params.productId) {
+      return new NextResponse("Product id is required", { status: 400 });
+    }
+
+    const storeByUserId = await db.store.findFirst({
+      where: {
+        id: params.storeId,
+        userId,
+      },
+    });
+
+    if (!storeByUserId) {
+      return new NextResponse("Unauthorized", { status: 405 });
+    }
+
+    const product = await db.product.delete({
+      where: {
+        id: params.productId,
+      },
+    });
+
+    return NextResponse.json(product);
+  } catch (error) {
+    console.log("[PRODUCT_DELETE]", error);
+    return new NextResponse("서버 오류", { status: 500 });
+  }
+}
