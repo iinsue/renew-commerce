@@ -11,6 +11,9 @@ const CategoryPage = async ({
     where: {
       id: params.categoryId,
     },
+    include: {
+      billboard: true,
+    },
   });
 
   // DB에서 가게가 만든 빌보드 리스트 조회
