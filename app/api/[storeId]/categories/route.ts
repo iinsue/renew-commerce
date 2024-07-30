@@ -52,3 +52,26 @@ export async function POST(
     return new NextResponse("서버 오류", { status: 500 });
   }
 }
+
+export async function GET(
+  request: Request,
+  { params }: { params: { storeId: string } },
+) {
+  try {
+    if (!params.storeId) {
+      return new NextResponse("스토어를 찾을 수 없습니다.", { status: 400 });
+    }
+
+    // DB에서 카테고리 모두 조회
+    const categories = await db.category.findMany({
+      where: {
+        storeId: params.storeId,
+      },
+    });
+
+    return NextResponse.json(categories);
+  } catch (error) {
+    console.log("[CATEGORY_GET]", error);
+    return new NextResponse("서버 오류", { status: 500 });
+  }
+}
