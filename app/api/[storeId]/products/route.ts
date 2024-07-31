@@ -80,3 +80,46 @@ export async function POST(
     return new NextResponse("서버 오류", { status: 500 });
   }
 }
+
+export async function GET(
+  request: Request,
+  { params }: { params: { storeId: string } },
+) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const categoryId = searchParams.get("categoryId") || undefined;
+    const colorId = searchParams.get("colorId") || undefined;
+    const sizeId = searchParams.get("sizeId") || undefined;
+    const isFeatured = searchParams.get("isFeatured");
+
+    if (!params.storeId) {
+      return new NextResponse("스토어가 없습니다.", { status: 400 });
+    }
+
+    // DB에서 상품 리스트 조회
+    const products = await db.product.findMany({
+      where: {
+        storeId: params.storeId,
+        categoryId,
+        colorId,
+        sizeId,
+        isFeatured: isFeatured ? true : undefined,
+        isArchived: false,
+      },
+      include: {
+        images: true,
+        category: true,
+        color: true,
+        size: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    return NextResponse.json(products);
+  } catch (error) {
+    console.log("[PRODUCTS_GET]", error);
+    return new NextResponse("서버 오류", { status: 500 });
+  }
+}
