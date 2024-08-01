@@ -46,3 +46,25 @@ export async function POST(
     return new NextResponse("서버 오류", { status: 500 });
   }
 }
+
+export async function GET(
+  request: Request,
+  { params }: { params: { storeId: string } },
+) {
+  try {
+    if (!params.storeId) {
+      return new NextResponse("스토어가 없습니다.", { status: 400 });
+    }
+
+    const colors = await db.color.findMany({
+      where: {
+        storeId: params.storeId,
+      },
+    });
+
+    return NextResponse.json(colors);
+  } catch (error) {
+    console.log("[COLORS_GET]", error);
+    return new NextResponse("서버 오류", { status: 500 });
+  }
+}

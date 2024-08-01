@@ -54,3 +54,24 @@ export async function POST(
     return new Response("서버 오류", { status: 500 });
   }
 }
+
+export async function GET(
+  request: Request,
+  { params }: { params: { storeId: string } },
+) {
+  try {
+    if (!params.storeId) {
+      return new NextResponse("스토어가 없습니다.", { status: 400 });
+    }
+    const sizes = await db.size.findMany({
+      where: {
+        storeId: params.storeId,
+      },
+    });
+
+    return NextResponse.json(sizes);
+  } catch (error) {
+    console.log("[SIZES_GET]", error);
+    return new NextResponse("서버 오류", { status: 500 });
+  }
+}
