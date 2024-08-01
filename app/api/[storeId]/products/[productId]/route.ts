@@ -141,3 +141,31 @@ export async function DELETE(
     return new NextResponse("서버 오류", { status: 500 });
   }
 }
+
+// 상품 상세 정보
+export async function GET(
+  request: Request,
+  { params }: { params: { productId: string } },
+) {
+  try {
+    if (!params.productId) {
+      return new NextResponse("상품이 없습니다.", { status: 400 });
+    }
+    const product = await db.product.findUnique({
+      where: {
+        id: params.productId,
+      },
+      include: {
+        images: true,
+        category: true,
+        color: true,
+        size: true,
+      },
+    });
+
+    return NextResponse.json(product);
+  } catch (error) {
+    console.log("[PRODUCT_GET]", error);
+    return new NextResponse("서버 오류", { status: 500 });
+  }
+}
