@@ -103,3 +103,27 @@ export async function DELETE(
     return new NextResponse("서버 오류", { status: 500 });
   }
 }
+
+export async function GET(
+  request: Request,
+  { params }: { params: { categoryId: string } },
+) {
+  try {
+    if (!params.categoryId) {
+      return new NextResponse("카테고리가 없습니다.", { status: 400 });
+    }
+    const category = await db.category.findUnique({
+      where: {
+        id: params.categoryId,
+      },
+      include: {
+        billboard: true,
+      },
+    });
+
+    return NextResponse.json(category);
+  } catch (error) {
+    console.log("[CATEGORY_GET]", error);
+    return new NextResponse("서버 오류", { status: 500 });
+  }
+}
