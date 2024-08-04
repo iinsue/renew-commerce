@@ -61,7 +61,6 @@ export async function POST(request: Request) {
         isArchived: true,
       },
     });
-
-    return new NextResponse(null, { status: 200 });
   }
+  return new NextResponse(null, { status: 200 });
 }
