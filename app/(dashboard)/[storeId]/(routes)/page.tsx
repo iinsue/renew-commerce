@@ -8,6 +8,8 @@ import { Heading } from "@/components/ui/heading";
 import { Separator } from "@/components/ui/separator";
 import { formatter } from "@/lib/utils";
 import { CreditCard, DollarSign, Package } from "lucide-react";
+import { Overview } from "@/components/overview";
+import { getGraphRevenue } from "@/actions/get-graph-revenue";
 
 type Props = {
   params: { storeId: string };
@@ -17,6 +19,7 @@ const DashboardPage: React.FC<Props> = async ({ params }: Props) => {
   const totalRevenue = await getTotalRevenue(params.storeId);
   const salesCount = await getSalesCount(params.storeId);
   const stockCount = await getStockCount(params.storeId);
+  const graphRevenue = await getGraphRevenue(params.storeId);
 
   return (
     <div className="flex-col">
@@ -56,6 +59,14 @@ const DashboardPage: React.FC<Props> = async ({ params }: Props) => {
             </CardContent>
           </Card>
         </div>
+        <Card className="col-span-4">
+          <CardHeader>
+            <CardTitle>Overview</CardTitle>
+          </CardHeader>
+          <CardContent className="pl-2">
+            <Overview data={graphRevenue} />
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
