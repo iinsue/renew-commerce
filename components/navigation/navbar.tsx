@@ -6,6 +6,7 @@ import { UserButton } from "@clerk/nextjs";
 
 import { NavLinks } from "./nav-links";
 import { StoreSwitcher } from "./store-switcher";
+import { ThemeToggle } from "../theme-toggle";
 
 export const Navbar = async () => {
   // 로그인된 사용자인지 확인
@@ -25,6 +26,7 @@ export const Navbar = async () => {
         <StoreSwitcher items={stores} />
         <NavLinks className="mx-6" />
         <div className="ml-auto flex items-center space-x-4">
+          <ThemeToggle />
           <UserButton afterSwitchSessionUrl="/" />
         </div>
       </div>
